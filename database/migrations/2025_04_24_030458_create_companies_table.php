@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sensor_data', function (Blueprint $table) {
+        Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('building_name')->nullable();
-            $table->string('maximum_load')->nullable();
-            $table->string('current_load')->nullable();
-            $table->string('deflection')->nullable();
-            $table->boolean('status')->default(1);
+            $table->string('name')->nullable();
+            $table->longText('address')->nullable();
             $table->bigInteger('user_id')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sensor_data');
+        Schema::dropIfExists('companies');
     }
 };

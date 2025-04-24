@@ -23,6 +23,7 @@ return new class extends Migration
             $table->longText('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('pwd_id_no')->nullable();
+            $table->bigInteger('role_id')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
