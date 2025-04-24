@@ -52,7 +52,6 @@ class AuthController extends Controller
             ], 422);
         }
     }
-
     public function login(Request $request)
     {
         try {
@@ -67,7 +66,8 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            $user = Auth::user();
+
+            $user = Auth::user()->load('company');
 
             return response()->json([
                 'status' => 'success',
