@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\CompanyController;
+use App\Http\Controllers\API\UserController;
 
 Route::get('/test', function () {
     return response()->json(['status' => 'success', 'message' => 'API Endpoint Works!'], 200);
@@ -34,4 +35,12 @@ Route::group(['prefix' => '/company'], function () {
     Route::post('/store', [CompanyController::class, 'store']);
     Route::patch('/update/{id}', [CompanyController::class, 'update']);
     Route::patch('/destroy/{id}', [CompanyController::class, 'destroy']);
+});
+
+
+Route::group(['prefix' => '/user'], function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::put('/update/{id}', [UserController::class, 'update']);
+    Route::patch('/destroy/{id}', [UserController::class, 'destroy']);
 });
