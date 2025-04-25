@@ -20,4 +20,9 @@ class JobPosting extends Model
     {
         return $this->hasMany(Applicant::class);
     }
+
+    public function disabilityTypes()
+    {
+        return $this->belongsToMany(DisabilityType::class, 'job_posting_disability_types')->withTimestamps();
+    }
 }

@@ -13,4 +13,9 @@ class DisabilityType extends Model
         'name',
         'status'
     ];
+
+    public function jobPostings()
+    {
+        return $this->belongsToMany(JobPosting::class, 'job_posting_disability_types')->withTimestamps();
+    }
 }

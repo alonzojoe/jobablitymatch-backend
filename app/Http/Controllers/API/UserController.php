@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserDisabilityType;
 use Exception;
+
 
 class UserController extends Controller
 {
@@ -13,7 +15,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = User::with(['role', 'company'])->where('status', 1);
+            $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
 
 
             if ($request->has('lastname')) {
@@ -59,7 +61,7 @@ class UserController extends Controller
     {
         try {
 
-            $user = User::with(['role', 'company'])->findOrFail($id);
+            $user = User::with(['role', 'company', 'disabilityTypes'])->findOrFail($id);
 
             return response()->json([
                 'status' => 'success',
@@ -89,7 +91,9 @@ class UserController extends Controller
                 'phone' => 'nullable|string',
                 'pwd_id_no' => 'nullable|string',
                 'role_id' => 'nullable|exists:roles,id',
+                'disability_type_ids' => 'nullable|array',
             ]);
+
 
             $user->update([
                 'firstname' => $request->firstname ?? $user->firstname,
@@ -102,6 +106,19 @@ class UserController extends Controller
                 'pwd_id_no' => $request->pwd_id_no ?? $user->pwd_id_no,
                 'role_id' => $request->role_id ?? $user->role_id,
             ]);
+
+
+            $disabilityTypeIds = $request->disability_type_ids;
+            if (!empty($disabilityTypeIds)) {
+                UserDisabilityType::where('user_id', $user->id)->delete();
+                foreach ($disabilityTypeIds as $disabilityTypeId) {
+                    UserDisabilityType::create([
+                        'user_id' => $user->id,
+                        'disability_type_id' => $disabilityTypeId,
+                        'status' => 1,
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => 'success',

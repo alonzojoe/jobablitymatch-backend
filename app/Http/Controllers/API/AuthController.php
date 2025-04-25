@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 use App\Models\User;
+use App\Models\UserDisabilityType;
 
 class AuthController extends Controller
 {
@@ -35,7 +36,11 @@ class AuthController extends Controller
                 'role_id' => 'nullable|exists:roles,id',
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:6',
+                'disability_type_ids' => 'nullable|array',
+
             ]);
+
+
 
             $user = User::create([
                 'firstname' => $request->firstname,
@@ -50,6 +55,20 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password)
             ]);
+
+            $userId = $user->id;
+            $disabilityTypeIds = $request->disability_type_ids;
+
+            if (!empty($disabilityTypeIds)) {
+                UserDisabilityType::where('user_id', $userId)->delete();
+                foreach ($disabilityTypeIds as $disabilityTypeId) {
+                    UserDisabilityType::create([
+                        'user_id' => $userId,
+                        'disability_type_id' => $disabilityTypeId,
+                        'status' => 1,
+                    ]);
+                }
+            }
 
             $token = Auth::login($user);
 

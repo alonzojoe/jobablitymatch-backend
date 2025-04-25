@@ -76,4 +76,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Applicant::class);
     }
+
+    public function disabilityTypes()
+    {
+        return $this->belongsToMany(DisabilityType::class, 'user_disability_types')->withTimestamps();
+    }
 }

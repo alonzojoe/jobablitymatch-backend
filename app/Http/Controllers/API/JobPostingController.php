@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\JobPosting;
+use App\Models\JobPostingDisabilityType;
 
 class JobPostingController extends Controller
 {
@@ -96,13 +97,30 @@ class JobPostingController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'company_id' => 'required|exists:companies,id',
+                'disability_type_ids' => 'nullable|array',
             ]);
+
 
             $jobPosting = JobPosting::create([
                 'title' => $request->title,
                 'description' => $request->description,
                 'company_id' => $request->company_id,
             ]);
+
+
+            $disabilityTypeIds = $request->disability_type_ids;
+            if (!empty($disabilityTypeIds)) {
+
+                JobPostingDisabilityType::where('job_posting_id', $jobPosting->id)->delete();
+
+                foreach ($disabilityTypeIds as $disabilityTypeId) {
+                    JobPostingDisabilityType::create([
+                        'job_posting_id' => $jobPosting->id,
+                        'disability_type_id' => $disabilityTypeId,
+                        'status' => 1,
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => 'success',
@@ -118,7 +136,6 @@ class JobPostingController extends Controller
         }
     }
 
-
     public function update(Request $request, $id)
     {
         try {
@@ -127,12 +144,30 @@ class JobPostingController extends Controller
             $request->validate([
                 'title' => 'nullable|string',
                 'description' => 'nullable|string',
+                'disability_type_ids' => 'nullable|array',
             ]);
+
 
             $jobPosting->update([
                 'title' => $request->title ?? $jobPosting->title,
                 'description' => $request->description ?? $jobPosting->description,
             ]);
+
+
+            $disabilityTypeIds = $request->disability_type_ids;
+            if (!empty($disabilityTypeIds)) {
+
+                JobPostingDisabilityType::where('job_posting_id', $jobPosting->id)->delete();
+
+               
+                foreach ($disabilityTypeIds as $disabilityTypeId) {
+                    JobPostingDisabilityType::create([
+                        'job_posting_id' => $jobPosting->id,
+                        'disability_type_id' => $disabilityTypeId,
+                        'status' => 1,
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => 'success',
