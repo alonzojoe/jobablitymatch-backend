@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -8,7 +9,7 @@ use App\Http\Controllers\API\CompanyController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DisabilityTypeController;
 use App\Http\Controllers\API\JobPostingController;
-
+use App\Http\Controllers\API\ApplicantController;
 
 
 Route::get('/test', function () {
@@ -65,4 +66,11 @@ Route::group(['prefix' => '/posting'], function () {
     Route::put('/update/{id}', [JobPostingController::class, 'update']);
     Route::patch('/destroy/{id}', [JobPostingController::class, 'destroy']);
     Route::patch('/inactive/{id}', [JobPostingController::class, 'inactive']);
+});
+
+Route::group(['prefix' => '/applicant'], function () {
+    Route::get('/', [ApplicantController::class, 'getByJobPosting']);
+    Route::get('/{id}', [ApplicantController::class, 'show']);
+    Route::patch('/update/{id}', [ApplicantController::class, 'update']);
+    Route::patch('/destroy/{id}', [ApplicantController::class, 'destroy']);
 });

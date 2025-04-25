@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('job_posting_id')->nullable();
             $table->string('status')->default('Pending');
+            $table->boolean('active')->default(1);
             $table->timestamps();
         });
     }
