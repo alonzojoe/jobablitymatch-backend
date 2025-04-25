@@ -60,6 +60,7 @@ Route::group(['prefix' => '/disability'], function () {
 
 Route::group(['prefix' => '/posting'], function () {
     Route::get('/', [JobPostingController::class, 'index']);
+    Route::get('/recommended/{user_id}', [JobPostingController::class, 'index']);
     Route::get('/{id}', [JobPostingController::class, 'show']);
     Route::get('/company/{id}', [JobPostingController::class, 'getByCompany']);
     Route::post('/create', [JobPostingController::class, 'store']);

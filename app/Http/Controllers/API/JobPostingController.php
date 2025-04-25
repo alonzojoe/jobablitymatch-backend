@@ -6,21 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\JobPosting;
 use App\Models\JobPostingDisabilityType;
+use App\Models\User;
 
 class JobPostingController extends Controller
 {
-
     public function index(Request $request)
     {
         try {
-            $query = JobPosting::with('company');
+            $query = JobPosting::with(['company', 'disabilityTypes']);
 
-            if ($request->has('title')) {
-                $query->where('title', 'LIKE', '%' . $request->title . '%');
-            }
 
-            if ($request->has('description')) {
-                $query->where('description', 'LIKE', '%' . $request->description . '%');
+            if ($request->has('searchQuery')) {
+                $searchQuery = '%' . $request->searchQuery . '%';
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('title', 'LIKE', $searchQuery)
+                        ->orWhere('description', 'LIKE', $searchQuery)
+                        ->orWhereHas('company', function ($companyQuery) use ($searchQuery) {
+                            $companyQuery->where('name', 'LIKE', $searchQuery);
+                        });
+                });
             }
 
             if ($request->has('company_id')) {
@@ -44,6 +48,94 @@ class JobPostingController extends Controller
             ], 500);
         }
     }
+
+    public function recommended(Request $request, $user_id)
+    {
+        try {
+
+            $user = User::with('disabilityTypes')->findOrFail($user_id);
+
+
+            $userDisabilityTypeIds = $user->disabilityTypes->pluck('id');
+
+            $query = JobPosting::with(['company', 'disabilityTypes']);
+
+
+            if ($request->has('searchQuery')) {
+                $searchQuery = '%' . $request->searchQuery . '%';
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('title', 'LIKE', $searchQuery)
+                        ->orWhere('description', 'LIKE', $searchQuery)
+                        ->orWhereHas('company', function ($companyQuery) use ($searchQuery) {
+                            $companyQuery->where('name', 'LIKE', $searchQuery);
+                        });
+                });
+            }
+
+
+            if ($request->has('company_id')) {
+                $query->where('company_id', $request->company_id);
+            }
+
+
+            if ($userDisabilityTypeIds->isNotEmpty()) {
+                $query->whereHas('disabilityTypes', function ($q) use ($userDisabilityTypeIds) {
+                    $q->whereIn('id', $userDisabilityTypeIds);
+                });
+            }
+
+            $jobPostings = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+            return response()->json([
+                'status' => 'success',
+                'current_page' => $jobPostings->currentPage(),
+                'total_pages' => $jobPostings->lastPage(),
+                'total_items' => $jobPostings->total(),
+                'data' => $jobPostings->items(),
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         $query = JobPosting::with('company');
+
+    //         if ($request->has('title')) {
+    //             $query->where('title', 'LIKE', '%' . $request->title . '%');
+    //         }
+
+    //         if ($request->has('description')) {
+    //             $query->where('description', 'LIKE', '%' . $request->description . '%');
+    //         }
+
+    //         if ($request->has('company_id')) {
+    //             $query->where('company_id', $request->company_id);
+    //         }
+
+    //         $jobPostings = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'current_page' => $jobPostings->currentPage(),
+    //             'total_pages' => $jobPostings->lastPage(),
+    //             'total_items' => $jobPostings->total(),
+    //             'data' => $jobPostings->items(),
+    //         ], 200);
+    //     } catch (\Throwable $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'An error occurred',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
 
     public function getByCompany(Request $request, $company_id)
@@ -159,7 +251,7 @@ class JobPostingController extends Controller
 
                 JobPostingDisabilityType::where('job_posting_id', $jobPosting->id)->delete();
 
-               
+
                 foreach ($disabilityTypeIds as $disabilityTypeId) {
                     JobPostingDisabilityType::create([
                         'job_posting_id' => $jobPosting->id,
