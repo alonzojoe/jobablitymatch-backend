@@ -7,6 +7,8 @@ use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\CompanyController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DisabilityTypeController;
+use App\Http\Controllers\API\JobPostingController;
+
 
 
 Route::get('/test', function () {
@@ -53,4 +55,14 @@ Route::group(['prefix' => '/disability'], function () {
     Route::post('/create', [DisabilityTypeController::class, 'store']);
     Route::put('/update/{id}', [DisabilityTypeController::class, 'update']);
     Route::patch('/destroy/{id}', [DisabilityTypeController::class, 'destroy']);
+});
+
+Route::group(['prefix' => '/posting'], function () {
+    Route::get('/', [JobPostingController::class, 'index']);
+    Route::get('/{id}', [JobPostingController::class, 'show']);
+    Route::get('/company/{id}', [JobPostingController::class, 'getByCompany']);
+    Route::post('/create', [JobPostingController::class, 'store']);
+    Route::put('/update/{id}', [JobPostingController::class, 'update']);
+    Route::patch('/destroy/{id}', [JobPostingController::class, 'destroy']);
+    Route::patch('/inactive/{id}', [JobPostingController::class, 'inactive']);
 });
