@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Company extends Model
+class Applicant extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'user_id', 'status'];
-
+    protected $fillable = ['user_id', 'job_posting_id', 'status', 'active'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function jobPostings()
+    public function jobPosting()
     {
-        return $this->hasMany(JobPosting::class);
+        return $this->belongsTo(JobPosting::class);
     }
 }

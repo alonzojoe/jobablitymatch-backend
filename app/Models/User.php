@@ -19,11 +19,19 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'lastname',
+        'firstname',
+        'middlename',
+        'birthdate',
+        'gender',
+        'address',
+        'phone',
+        'pwd_id_no',
+        'role_id',
         'email',
         'password',
+        'status'
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -62,5 +70,15 @@ class User extends Authenticatable implements JWTSubject
     public function company()
     {
         return $this->hasOne(Company::class);
+    }
+
+    public function applicants()
+    {
+        return $this->hasMany(Applicant::class);
+    }
+
+    public function disabilityTypes()
+    {
+        return $this->belongsToMany(DisabilityType::class, 'user_disability_types')->withTimestamps();
     }
 }

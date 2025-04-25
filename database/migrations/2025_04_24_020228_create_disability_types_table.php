@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('disability_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

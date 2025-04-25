@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Company extends Model
+class UserDisabilityType extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['name', 'address', 'user_id', 'status'];
+    protected $fillable = ['user_id', 'disability_type_id', 'status'];
 
 
     public function user()
@@ -17,8 +16,8 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function jobPostings()
+    public function disabilityType()
     {
-        return $this->hasMany(JobPosting::class);
+        return $this->belongsTo(DisabilityType::class);
     }
 }
