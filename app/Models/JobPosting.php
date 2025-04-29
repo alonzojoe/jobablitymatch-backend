@@ -9,7 +9,7 @@ class JobPosting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'company_id', 'active', 'status'];
+    protected $fillable = ['title', 'description', 'vacant_positions', 'company_id', 'active', 'status'];
 
     public function company()
     {
