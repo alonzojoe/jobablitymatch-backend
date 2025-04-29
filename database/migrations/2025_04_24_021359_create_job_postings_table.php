@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->longText('description')->nullable();
+            $table->integer('vacant_positions')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->boolean('active')->default(1);
             $table->boolean('status')->default(1);

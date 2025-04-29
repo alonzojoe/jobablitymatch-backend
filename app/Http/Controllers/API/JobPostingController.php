@@ -186,9 +186,10 @@ class JobPostingController extends Controller
     {
         try {
             $request->validate([
-                'title' => 'required|string',
-                'description' => 'required|string',
-                'company_id' => 'required|exists:companies,id',
+                'title' => 'nullable|string',
+                'description' => 'nullable|string',
+                'vacant_positions' => 'nullable|integer',
+                'company_id' => 'nullable|integer',
                 'disability_type_ids' => 'nullable|array',
             ]);
 
@@ -197,6 +198,7 @@ class JobPostingController extends Controller
                 'title' => $request->title,
                 'description' => $request->description,
                 'company_id' => $request->company_id,
+                'vacant_positions' => $request->vacant_positions
             ]);
 
 
@@ -236,6 +238,7 @@ class JobPostingController extends Controller
             $request->validate([
                 'title' => 'nullable|string',
                 'description' => 'nullable|string',
+                'vacant_positions' => 'nullable|integer',
                 'disability_type_ids' => 'nullable|array',
             ]);
 
@@ -243,6 +246,7 @@ class JobPostingController extends Controller
             $jobPosting->update([
                 'title' => $request->title ?? $jobPosting->title,
                 'description' => $request->description ?? $jobPosting->description,
+                'vacant_positions' =>  $request->vacant_positions ?? $jobPosting->vacant_positions,
             ]);
 
 
