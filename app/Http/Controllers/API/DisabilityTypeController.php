@@ -10,6 +10,28 @@ use Exception;
 class DisabilityTypeController extends Controller
 {
 
+    public function all()
+    {
+        try {
+
+            $disabilityTypes = DisabilityType::where('status', 1)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'total_items' => $disabilityTypes->count(),
+                'data' => $disabilityTypes,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         try {

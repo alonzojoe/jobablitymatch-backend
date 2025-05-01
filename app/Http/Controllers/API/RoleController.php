@@ -10,13 +10,54 @@ use Exception;
 class RoleController extends Controller
 {
 
-    public function index()
+
+    public function all()
     {
         try {
-            $role = Role::where('status', 1)->get();
-            return response()->json(['status' => 'success', 'data' => $role,], 200);
+
+            $roles = Role::withCount('users')
+                ->where('status', 1)
+                ->orderBy('id', 'asc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'total_items' => $roles->count(),
+                'data' => $roles,
+            ], 200);
         } catch (\Throwable $e) {
-            return response()->json(['status' => 'error', 'message' => 'An error occurred', 'error' => $e->getMessage(),], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function index(Request $request)
+    {
+        try {
+            $query = Role::withCount('users')->where('status', 1);
+
+            if ($request->has('name')) {
+                $query->where('name', 'LIKE', '%' . $request->name . '%');
+            }
+
+            $roles = $query->orderBy('id', 'asc')->paginate($request->input('per_page', 10));
+
+            return response()->json([
+                'status' => 'success',
+                'current_page' => $roles->currentPage(),
+                'total_pages' => $roles->lastPage(),
+                'total_items' => $roles->total(),
+                'data' => $roles->items(),
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 

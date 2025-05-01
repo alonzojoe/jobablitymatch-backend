@@ -43,12 +43,12 @@ class AuthController extends Controller
 
 
             $user = User::create([
-                'firstname' => $request->firstname,
-                'lastname' => $request->lastname,
-                'middlename' => $request->middlename,
+                'firstname' => strtoupper($request->firstname),
+                'lastname' => strtoupper($request->lastname),
+                'middlename' => strtoupper($request->middlename),
                 'birthdate' => $request->birthdate,
-                'gender' => $request->gender,
-                'address' => $request->address,
+                'gender' => strtoupper($request->gender),
+                'address' => strtoupper($request->address),
                 'phone' => $request->phone,
                 'pwd_id_no' => $request->pwd_id_no,
                 'role_id' => $request->role_id,
