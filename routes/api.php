@@ -28,6 +28,7 @@ Route::group(['prefix' => '/auth'], function () {
 });
 
 Route::group(['prefix' => '/role'], function () {
+    Route::get('/all', [RoleController::class, 'all']);
     Route::get('/', [RoleController::class, 'index']);
     Route::post('/create', [RoleController::class, 'store']);
     Route::patch('/update/{id}', [RoleController::class, 'update']);
@@ -51,6 +52,7 @@ Route::group(['prefix' => '/user'], function () {
 });
 
 Route::group(['prefix' => '/disability'], function () {
+    Route::get('/all', [DisabilityTypeController::class, 'all']);
     Route::get('/', [DisabilityTypeController::class, 'index']);
     Route::get('/{id}', [DisabilityTypeController::class, 'show']);
     Route::post('/create', [DisabilityTypeController::class, 'store']);
