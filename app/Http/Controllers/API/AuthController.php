@@ -104,7 +104,7 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            $user = Auth::user()->load('position');
+            $user = Auth::user()->load('role');
 
             return response()->json([
                 'status' => 'success',
@@ -145,7 +145,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'user' => Auth::user()->load('position')
+            'user' => Auth::user()->load('role')
         ], 200);
     }
 
