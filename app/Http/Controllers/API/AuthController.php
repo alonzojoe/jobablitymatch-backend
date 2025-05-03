@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 use App\Models\User;
+use App\Models\Company;
 use App\Models\UserDisabilityType;
 
 class AuthController extends Controller
@@ -53,22 +54,36 @@ class AuthController extends Controller
                 'pwd_id_no' => $request->pwd_id_no,
                 'role_id' => $request->role_id,
                 'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'company' => 'nullable|string|unique:companies,name',
+                'company_address' => 'nullable|string',
             ]);
 
             $userId = $user->id;
+            $roleId = $request->role_id;
             $disabilityTypeIds = $request->disability_type_ids;
 
-            if (!empty($disabilityTypeIds)) {
-                UserDisabilityType::where('user_id', $userId)->delete();
-                foreach ($disabilityTypeIds as $disabilityTypeId) {
-                    UserDisabilityType::create([
-                        'user_id' => $userId,
-                        'disability_type_id' => $disabilityTypeId,
-                        'status' => 1,
-                    ]);
+            if ($roleId == 2) {
+                if (!empty($disabilityTypeIds)) {
+                    UserDisabilityType::where('user_id', $userId)->delete();
+                    foreach ($disabilityTypeIds as $disabilityTypeId) {
+                        UserDisabilityType::create([
+                            'user_id' => $userId,
+                            'disability_type_id' => $disabilityTypeId,
+                            'status' => 1,
+                        ]);
+                    }
                 }
+            } else if ($roleId == 3) {
+                Company::create([
+                    'name' => $request->company,
+                    'address' => $request->company_address ?? '',
+                    'user_id' => $userId,
+                    'status' => 1,
+                ]);
             }
+
+
 
             $token = Auth::login($user);
 
