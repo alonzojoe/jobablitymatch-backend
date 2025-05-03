@@ -10,6 +10,50 @@ use App\Models\User;
 
 class JobPostingController extends Controller
 {
+
+    public function list(Request $request)
+    {
+        try {
+            $query = JobPosting::with(['company', 'disabilityTypes']);
+
+
+            if ($request->filled('title')) {
+                $query->where('title', 'LIKE', '%' . $request->title . '%');
+            }
+
+
+            if ($request->filled('description')) {
+                $query->where('description', 'LIKE', '%' . $request->description . '%');
+            }
+
+
+            if ($request->filled('active') && $request->active != 0) {
+                $query->where('active', $request->active);
+            }
+
+            if ($request->filled('company_id')) {
+                $query->where('company_id', $request->company_id);
+            }
+
+            $jobPostings = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+            return response()->json([
+                'status' => 'success',
+                'current_page' => $jobPostings->currentPage(),
+                'total_pages' => $jobPostings->lastPage(),
+                'total_items' => $jobPostings->total(),
+                'data' => $jobPostings->items(),
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
     public function index(Request $request)
     {
         try {
