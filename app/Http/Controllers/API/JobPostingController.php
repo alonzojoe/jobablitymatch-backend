@@ -14,7 +14,8 @@ class JobPostingController extends Controller
     public function list(Request $request)
     {
         try {
-            $query = JobPosting::with(['company', 'disabilityTypes']);
+            $query = JobPosting::with(['company', 'disabilityTypes'])
+                ->where('status', 1);
 
 
             if ($request->filled('title')) {
