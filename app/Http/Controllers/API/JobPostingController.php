@@ -100,7 +100,11 @@ class JobPostingController extends Controller
             $user = User::with('disabilityTypes')->findOrFail($user_id);
             $userDisabilityTypeIds = $user->disabilityTypes->pluck('id');
 
-            $query = JobPosting::with(['company', 'disabilityTypes']);
+
+            // return response()->json(['data' => $userDisabilityTypeIds], 200);
+
+            $query = JobPosting::with(['company', 'disabilityTypes'])
+                ->where('status', 1);
 
 
             if ($request->has('searchQuery')) {
