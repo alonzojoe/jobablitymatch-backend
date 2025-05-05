@@ -58,8 +58,8 @@ class JobPostingController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = JobPosting::with(['company', 'disabilityTypes']);
-
+            $query = JobPosting::with(['company', 'disabilityTypes'])
+                ->where('status', 1);
 
             if ($request->has('searchQuery')) {
                 $searchQuery = '%' . $request->searchQuery . '%';
@@ -97,10 +97,7 @@ class JobPostingController extends Controller
     public function recommended(Request $request, $user_id)
     {
         try {
-
             $user = User::with('disabilityTypes')->findOrFail($user_id);
-
-
             $userDisabilityTypeIds = $user->disabilityTypes->pluck('id');
 
             $query = JobPosting::with(['company', 'disabilityTypes']);
@@ -109,27 +106,28 @@ class JobPostingController extends Controller
             if ($request->has('searchQuery')) {
                 $searchQuery = '%' . $request->searchQuery . '%';
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('title', 'LIKE', $searchQuery)
-                        ->orWhere('description', 'LIKE', $searchQuery)
+                    $q->where('job_postings.title', 'LIKE', $searchQuery)
+                        ->orWhere('job_postings.description', 'LIKE', $searchQuery)
                         ->orWhereHas('company', function ($companyQuery) use ($searchQuery) {
-                            $companyQuery->where('name', 'LIKE', $searchQuery);
+                            $companyQuery->where('companies.name', 'LIKE', $searchQuery);
                         });
                 });
             }
 
 
             if ($request->has('company_id')) {
-                $query->where('company_id', $request->company_id);
+                $query->where('job_postings.company_id', $request->company_id);
             }
 
 
             if ($userDisabilityTypeIds->isNotEmpty()) {
                 $query->whereHas('disabilityTypes', function ($q) use ($userDisabilityTypeIds) {
-                    $q->whereIn('id', $userDisabilityTypeIds);
+                    $q->whereIn('disability_types.id', $userDisabilityTypeIds);
                 });
             }
 
-            $jobPostings = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+            $jobPostings = $query->orderBy('job_postings.id', 'desc')->paginate($request->input('per_page', 10));
 
             return response()->json([
                 'status' => 'success',
@@ -146,6 +144,59 @@ class JobPostingController extends Controller
             ], 500);
         }
     }
+
+    // public function recommended(Request $request, $user_id)
+    // {
+    //     try {
+
+    //         $user = User::with('disabilityTypes')->findOrFail($user_id);
+
+
+    //         $userDisabilityTypeIds = $user->disabilityTypes->pluck('id');
+
+    //         $query = JobPosting::with(['company', 'disabilityTypes']);
+
+
+    //         if ($request->has('searchQuery')) {
+    //             $searchQuery = '%' . $request->searchQuery . '%';
+    //             $query->where(function ($q) use ($searchQuery) {
+    //                 $q->where('title', 'LIKE', $searchQuery)
+    //                     ->orWhere('description', 'LIKE', $searchQuery)
+    //                     ->orWhereHas('company', function ($companyQuery) use ($searchQuery) {
+    //                         $companyQuery->where('name', 'LIKE', $searchQuery);
+    //                     });
+    //             });
+    //         }
+
+
+    //         if ($request->has('company_id')) {
+    //             $query->where('company_id', $request->company_id);
+    //         }
+
+
+    //         if ($userDisabilityTypeIds->isNotEmpty()) {
+    //             $query->whereHas('disabilityTypes', function ($q) use ($userDisabilityTypeIds) {
+    //                 $q->whereIn('id', $userDisabilityTypeIds);
+    //             });
+    //         }
+
+    //         $jobPostings = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'current_page' => $jobPostings->currentPage(),
+    //             'total_pages' => $jobPostings->lastPage(),
+    //             'total_items' => $jobPostings->total(),
+    //             'data' => $jobPostings->items(),
+    //         ], 200);
+    //     } catch (\Throwable $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'An error occurred',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     // public function index(Request $request)
     // {
