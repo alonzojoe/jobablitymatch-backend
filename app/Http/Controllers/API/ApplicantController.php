@@ -143,4 +143,25 @@ class ApplicantController extends Controller
             ], 500);
         }
     }
+
+    public function getApplicationsByUser($user_id)
+    {
+        try {
+
+            $applications = Applicant::where('user_id', $user_id)
+                ->with('jobPosting')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $applications,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching applications',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

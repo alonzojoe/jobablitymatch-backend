@@ -10,7 +10,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DisabilityTypeController;
 use App\Http\Controllers\API\JobPostingController;
 use App\Http\Controllers\API\ApplicantController;
-
+use App\Models\Applicant;
 
 Route::get('/test', function () {
     return response()->json(['status' => 'success', 'message' => 'API Endpoint Works!'], 200);
@@ -78,4 +78,5 @@ Route::group(['prefix' => '/applicant'], function () {
     Route::post('/create', [ApplicantController::class, 'store']);
     Route::patch('/update/{id}', [ApplicantController::class, 'update']);
     Route::patch('/destroy/{id}', [ApplicantController::class, 'destroy']);
+    Route::get('/user/{id}', [ApplicantController::class, 'getApplicationsByUser']);
 });
