@@ -69,7 +69,7 @@ Route::group(['prefix' => '/posting'], function () {
     Route::post('/create', [JobPostingController::class, 'store']);
     Route::put('/update/{id}', [JobPostingController::class, 'update']);
     Route::patch('/destroy/{id}', [JobPostingController::class, 'destroy']);
-    Route::patch('/inactive/{id}', [JobPostingController::class, 'inactive']);
+    Route::patch('/status/{id}', [JobPostingController::class, 'activeinactive']);
 });
 
 Route::group(['prefix' => '/applicant'], function () {

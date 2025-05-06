@@ -399,16 +399,17 @@ class JobPostingController extends Controller
         }
     }
 
-    public function inactive($id)
+    public function activeinactive(Request $request, $id)
     {
+        $payload = $request->active;
         try {
             $jobPosting = JobPosting::findOrFail($id);
 
-            $jobPosting->update(['active' => 0]);
+            $jobPosting->update(['active' => $payload]);
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Job posting marked as inactive successfully',
+                'message' => 'Job posting updated successfully.',
                 'data' => $jobPosting,
             ], 200);
         } catch (\Throwable $e) {
