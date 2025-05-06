@@ -51,6 +51,34 @@ class ApplicantController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'job_posting_id' => 'required|exists:job_postings,id',
+            ]);
+
+
+            $applicant = Applicant::create([
+                'user_id' => $request->user_id,
+                'job_posting_id' => $request->job_posting_id,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Applicant created successfully',
+                'data' => $applicant,
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function show($id)
     {
         try {
@@ -111,6 +139,27 @@ class ApplicantController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getApplicationsByUser($user_id)
+    {
+        try {
+
+            $applications = Applicant::where('user_id', $user_id)
+                ->with('jobPosting')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $applications,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching applications',
                 'error' => $e->getMessage(),
             ], 500);
         }

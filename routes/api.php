@@ -10,7 +10,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DisabilityTypeController;
 use App\Http\Controllers\API\JobPostingController;
 use App\Http\Controllers\API\ApplicantController;
-
+use App\Models\Applicant;
 
 Route::get('/test', function () {
     return response()->json(['status' => 'success', 'message' => 'API Endpoint Works!'], 200);
@@ -69,12 +69,14 @@ Route::group(['prefix' => '/posting'], function () {
     Route::post('/create', [JobPostingController::class, 'store']);
     Route::put('/update/{id}', [JobPostingController::class, 'update']);
     Route::patch('/destroy/{id}', [JobPostingController::class, 'destroy']);
-    Route::patch('/inactive/{id}', [JobPostingController::class, 'inactive']);
+    Route::patch('/status/{id}', [JobPostingController::class, 'activeinactive']);
 });
 
 Route::group(['prefix' => '/applicant'], function () {
     Route::get('/', [ApplicantController::class, 'getByJobPosting']);
     Route::get('/{id}', [ApplicantController::class, 'show']);
+    Route::post('/create', [ApplicantController::class, 'store']);
     Route::patch('/update/{id}', [ApplicantController::class, 'update']);
     Route::patch('/destroy/{id}', [ApplicantController::class, 'destroy']);
+    Route::get('/user/{id}', [ApplicantController::class, 'getApplicationsByUser']);
 });
