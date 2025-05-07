@@ -177,6 +177,9 @@ class ApplicantController extends Controller
             $query = Applicant::where('job_posting_id', $job_posting_id)
                 ->with(['user', 'user.disabilityTypes']);
 
+            if ($request->has('status') && $request->status !== '') {
+                $query->where('status', $request->status);
+            }
 
             if ($lastname) {
                 $query->whereHas('user', fn($q) => $q->where('lastname', 'like', "%$lastname%"));
