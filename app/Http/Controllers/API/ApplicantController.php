@@ -164,4 +164,49 @@ class ApplicantController extends Controller
             ], 500);
         }
     }
+
+    public function getApplicantsByJobPosting(Request $request, $job_posting_id)
+    {
+        try {
+            $lastname = $request->input('lastname');
+            $firstname = $request->input('firstname');
+            $middlename = $request->input('middlename');
+            $email = $request->input('email');
+
+
+            $query = Applicant::where('job_posting_id', $job_posting_id)
+                ->with(['user', 'user.disabilityTypes']);
+
+
+            if ($lastname) {
+                $query->whereHas('user', fn($q) => $q->where('lastname', 'like', "%$lastname%"));
+            }
+            if ($firstname) {
+                $query->whereHas('user', fn($q) => $q->where('firstname', 'like', "%$firstname%"));
+            }
+            if ($middlename) {
+                $query->whereHas('user', fn($q) => $q->where('middlename', 'like', "%$middlename%"));
+            }
+            if ($email) {
+                $query->whereHas('user', fn($q) => $q->where('email', 'like', "%$email%"));
+            }
+
+
+            $applicants = $query->paginate(10);
+
+            return response()->json([
+                'status' => 'success',
+                'current_page' => $applicants->currentPage(),
+                'total_pages' => $applicants->lastPage(),
+                'total_items' => $applicants->total(),
+                'data' => $applicants->items(),
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching applicants',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
