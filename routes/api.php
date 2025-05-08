@@ -50,6 +50,8 @@ Route::group(['prefix' => '/user'], function () {
     Route::get('/{id}', [UserController::class, 'show']);
     Route::put('/update/{id}', [UserController::class, 'update']);
     Route::patch('/destroy/{id}', [UserController::class, 'destroy']);
+    Route::patch('/pwd/{user_id}', [UserController::class, 'updatePWDUser']);
+    Route::patch('/employer/{user_id}', [UserController::class, 'updateEmployer']);
 });
 
 Route::group(['prefix' => '/disability'], function () {
