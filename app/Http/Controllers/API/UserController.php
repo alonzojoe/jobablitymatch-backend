@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserDisabilityType;
+use App\Models\Company;
 use Exception;
 
 
@@ -149,6 +150,118 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updatePWDUser(Request $request, $user_id)
+    {
+        try {
+
+            $request->validate([
+                'firstname' => 'nullable|string',
+                'lastname' => 'nullable|string',
+                'middlename' => 'nullable|string',
+                'birthdate' => 'nullable|date',
+                'gender' => 'nullable|string',
+                'address' => 'nullable|string',
+                'phone' => 'nullable|string',
+                'pwd_id_no' => 'nullable|string',
+                'disability_type_ids' => 'nullable|array',
+            ]);
+
+            $user = User::findOrFail($user_id);
+            $user->update([
+                'firstname' => strtoupper($request->firstname),
+                'lastname' => strtoupper($request->lastname),
+                'middlename' => strtoupper($request->middlename),
+                'birthdate' => $request->birthdate,
+                'gender' => strtoupper($request->gender),
+                'address' => strtoupper($request->address),
+                'phone' => $request->phone,
+                'pwd_id_no' => $request->pwd_id_no,
+            ]);
+
+
+            if (!empty($request->disability_type_ids)) {
+                UserDisabilityType::where('user_id', $user_id)->delete();
+                foreach ($request->disability_type_ids as $disabilityTypeId) {
+                    UserDisabilityType::create([
+                        'user_id' => $user_id,
+                        'disability_type_id' => $disabilityTypeId,
+                        'status' => 1,
+                    ]);
+                }
+            }
+
+
+            $updatedUser = User::with(['role', 'disabilityTypes'])->findOrFail($user_id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'PWD User Updated Successfully!',
+                'user' => $updatedUser,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while updating PWD user data',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateEmployer(Request $request, $user_id)
+    {
+        try {
+
+            $request->validate([
+                'firstname' => 'nullable|string',
+                'lastname' => 'nullable|string',
+                'middlename' => 'nullable|string',
+                'birthdate' => 'nullable|date',
+                'gender' => 'nullable|string',
+                'address' => 'nullable|string',
+                'phone' => 'nullable|string',
+                'company' => 'nullable|string|unique:companies,name,' . $user_id . ',user_id',
+                'company_address' => 'nullable|string',
+            ]);
+
+
+            $user = User::findOrFail($user_id);
+            $user->update([
+                'firstname' => strtoupper($request->firstname),
+                'lastname' => strtoupper($request->lastname),
+                'middlename' => strtoupper($request->middlename),
+                'birthdate' => $request->birthdate,
+                'gender' => strtoupper($request->gender),
+                'address' => strtoupper($request->address),
+                'phone' => $request->phone,
+            ]);
+
+
+            $company = Company::where('id', $request->company_id)->first();
+            if ($company) {
+                $company->update([
+                    'name' => strtoupper($request->company),
+                    'address' => strtoupper($request->company_address),
+                ]);
+            }
+
+
+            $updatedUser = User::with(['role', 'company', 'disabilityTypes'])->findOrFail($user_id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Employer Updated Successfully!',
+                'user' => $updatedUser,
+                'company' => $company,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while updating employer data',
                 'error' => $e->getMessage(),
             ], 500);
         }
