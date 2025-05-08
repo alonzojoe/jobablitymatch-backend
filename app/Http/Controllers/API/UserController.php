@@ -158,6 +158,7 @@ class UserController extends Controller
     public function updatePWDUser(Request $request, $user_id)
     {
         try {
+
             $request->validate([
                 'firstname' => 'nullable|string',
                 'lastname' => 'nullable|string',
@@ -182,6 +183,7 @@ class UserController extends Controller
                 'pwd_id_no' => $request->pwd_id_no,
             ]);
 
+
             if (!empty($request->disability_type_ids)) {
                 UserDisabilityType::where('user_id', $user_id)->delete();
                 foreach ($request->disability_type_ids as $disabilityTypeId) {
@@ -193,10 +195,13 @@ class UserController extends Controller
                 }
             }
 
+
+            $updatedUser = User::with(['role', 'disabilityTypes'])->findOrFail($user_id);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'PWD User Updated Successfully!',
-                'user' => $user,
+                'user' => $updatedUser,
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
@@ -235,6 +240,7 @@ class UserController extends Controller
                 'phone' => $request->phone,
             ]);
 
+
             $company = Company::where('id', $request->company_id)->first();
             if ($company) {
                 $company->update([
@@ -242,10 +248,14 @@ class UserController extends Controller
                     'address' => strtoupper($request->company_address),
                 ]);
             }
+
+
+            $updatedUser = User::with(['role', 'company', 'disabilityTypes'])->findOrFail($user_id);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Employer Updated Successfully!',
-                'user' => $user,
+                'user' => $updatedUser,
                 'company' => $company,
             ], 200);
         } catch (\Throwable $e) {
