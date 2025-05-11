@@ -13,7 +13,7 @@ class CompanyController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Company::with('user')->where('status', 1);
+            $query = Company::with(['user', 'jobPostings'])->withCount('jobPostings')->where('status', 1);
 
             if ($request->has('name')) {
                 $query->where('name', 'LIKE', '%' . $request->name . '%');
@@ -22,6 +22,7 @@ class CompanyController extends Controller
             if ($request->has('address')) {
                 $query->where('address', 'LIKE', '%' . $request->address . '%');
             }
+
 
             if ($request->has('lastname')) {
                 $query->whereHas('user', function ($userQuery) use ($request) {
@@ -58,6 +59,7 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+
 
 
 
