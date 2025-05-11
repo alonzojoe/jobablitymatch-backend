@@ -15,7 +15,6 @@ class CompanyController extends Controller
         try {
             $query = Company::with('user')->where('status', 1);
 
-
             if ($request->has('name')) {
                 $query->where('name', 'LIKE', '%' . $request->name . '%');
             }
@@ -24,6 +23,23 @@ class CompanyController extends Controller
                 $query->where('address', 'LIKE', '%' . $request->address . '%');
             }
 
+            if ($request->has('lastname')) {
+                $query->whereHas('user', function ($userQuery) use ($request) {
+                    $userQuery->where('lastname', 'LIKE', '%' . $request->lastname . '%');
+                });
+            }
+
+            if ($request->has('firstname')) {
+                $query->whereHas('user', function ($userQuery) use ($request) {
+                    $userQuery->where('firstname', 'LIKE', '%' . $request->firstname . '%');
+                });
+            }
+
+            if ($request->has('middlename')) {
+                $query->whereHas('user', function ($userQuery) use ($request) {
+                    $userQuery->where('middlename', 'LIKE', '%' . $request->middlename . '%');
+                });
+            }
 
             $companies = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
 
@@ -42,6 +58,7 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+
 
 
     public function store(Request $request)
