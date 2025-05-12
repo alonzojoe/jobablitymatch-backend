@@ -18,6 +18,11 @@ class UserController extends Controller
         try {
             $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
 
+            if ($request->has('role_id')) {
+                $query->whereHas('role', function ($q) use ($request) {
+                    $q->where('id', $request->role_id);
+                });
+            }
 
             if ($request->has('lastname')) {
                 $query->where('lastname', 'LIKE', '%' . $request->lastname . '%');
@@ -38,7 +43,6 @@ class UserController extends Controller
             if ($request->has('pwd_id_no')) {
                 $query->where('pwd_id_no', 'LIKE', '%' . $request->pwd_id_no . '%');
             }
-
 
             $users = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
 
