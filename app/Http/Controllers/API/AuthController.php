@@ -76,8 +76,8 @@ class AuthController extends Controller
                 }
             } else if ($roleId == 3) {
                 Company::create([
-                    'name' => $request->company,
-                    'address' => $request->company_address ?? '',
+                    'name' => strtoupper($request->company),
+                    'address' => strtoupper($request->company_address) ?? '',
                     'user_id' => $userId,
                     'status' => 1,
                 ]);
@@ -104,7 +104,7 @@ class AuthController extends Controller
             ], 422);
         }
     }
-    
+
     public function login(Request $request)
     {
         try {
