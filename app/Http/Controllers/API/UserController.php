@@ -18,7 +18,7 @@ class UserController extends Controller
         try {
             $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
 
-            if ($request->has('role_id')) {
+            if ($request->has('role_id') && $request->role_id != 0) {
                 $query->whereHas('role', function ($q) use ($request) {
                     $q->where('id', $request->role_id);
                 });
@@ -261,6 +261,50 @@ class UserController extends Controller
                 'message' => 'Employer Updated Successfully!',
                 'user' => $updatedUser,
                 'company' => $company,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while updating employer data',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateUser(Request $request, $user_id)
+    {
+        try {
+
+            $request->validate([
+                'firstname' => 'nullable|string',
+                'lastname' => 'nullable|string',
+                'middlename' => 'nullable|string',
+                'birthdate' => 'nullable|date',
+                'gender' => 'nullable|string',
+                'address' => 'nullable|string',
+                'phone' => 'nullable|string',
+            ]);
+
+
+            $user = User::findOrFail($user_id);
+            $user->update([
+                'firstname' => strtoupper($request->firstname),
+                'lastname' => strtoupper($request->lastname),
+                'middlename' => strtoupper($request->middlename),
+                'birthdate' => $request->birthdate,
+                'gender' => strtoupper($request->gender),
+                'address' => strtoupper($request->address),
+                'phone' => $request->phone,
+            ]);
+
+
+
+            $updatedUser = User::with(['role', 'company', 'disabilityTypes'])->findOrFail($user_id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Employer Updated Successfully!',
+                'user' => $updatedUser,
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
