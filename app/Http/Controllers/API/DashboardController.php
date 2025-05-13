@@ -56,16 +56,41 @@ class DashboardController extends Controller
     public function admin()
     {
         try {
+
             $totalUsers = User::count();
             $totalCompanies = Company::count();
             $totalJobPostings = JobPosting::count();
             $totalApplicants = Applicant::count();
+
+            $recentUsers = User::with(['role', 'disabilityTypes', 'company'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $recentCompanies = Company::with(['user', 'jobPostings'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $recentJobPostings = JobPosting::with(['company', 'disabilityTypes'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $recentApplicants = Applicant::with(['user', 'jobPosting'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
 
             $dashboard = [
                 'total_users' => $totalUsers,
                 'total_companies' => $totalCompanies,
                 'total_job_postings' => $totalJobPostings,
                 'total_applicants' => $totalApplicants,
+                'recent_users' => $recentUsers,
+                'recent_companies' => $recentCompanies,
+                'recent_job_postings' => $recentJobPostings,
+                'recent_applicants' => $recentApplicants,
             ];
 
             return response()->json([
