@@ -11,7 +11,7 @@ use App\Http\Controllers\API\DisabilityTypeController;
 use App\Http\Controllers\API\JobPostingController;
 use App\Http\Controllers\API\ApplicantController;
 use App\Http\Controllers\API\DashboardController;
-
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/test', function () {
     return response()->json(['status' => 'success', 'message' => 'API Endpoint Works!'], 200);
@@ -88,5 +88,6 @@ Route::group(['prefix' => '/applicant'], function () {
 
 
 Route::group(['prefix' => '/dashboard'], function () {
+    Route::get('/admin', [DashboardController::class, 'admin']);
     Route::get('/company/{company_id}', [DashboardController::class, 'company']);
 });

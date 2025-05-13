@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Applicant;
 use App\Models\JobPosting;
+use App\Models\User;
+use App\Models\Company;
 
 class DashboardController extends Controller
 {
@@ -46,6 +48,35 @@ class DashboardController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while fetching company statistics',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function admin()
+    {
+        try {
+            $totalUsers = User::count();
+            $totalCompanies = Company::count();
+            $totalJobPostings = JobPosting::count();
+            $totalApplicants = Applicant::count();
+
+            $dashboard = [
+                'total_users' => $totalUsers,
+                'total_companies' => $totalCompanies,
+                'total_job_postings' => $totalJobPostings,
+                'total_applicants' => $totalApplicants,
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Admin dashboard data retrieved!',
+                'data' => $dashboard,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching admin statistics',
                 'error' => $e->getMessage(),
             ], 500);
         }
