@@ -124,11 +124,13 @@ class JobPostingController extends Controller
             }
 
 
-            if ($userDisabilityTypeIds->isNotEmpty()) {
-                $query->whereHas('disabilityTypes', function ($q) use ($userDisabilityTypeIds) {
-                    $q->whereIn('disability_types.id', $userDisabilityTypeIds);
-                });
-            }
+            // if ($userDisabilityTypeIds->isNotEmpty()) {
+            $query->whereHas('disabilityTypes', function ($q) use ($userDisabilityTypeIds) {
+                $q->whereIn('disability_types.id', $userDisabilityTypeIds);
+            });
+            // } else {
+
+            // }
 
 
             $jobPostings = $query->orderBy('job_postings.id', 'desc')->paginate($request->input('per_page', 10));

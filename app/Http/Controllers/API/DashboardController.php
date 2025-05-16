@@ -32,11 +32,27 @@ class DashboardController extends Controller
             })->where('status', 'Rejected')->count();
 
 
+            $recentJobPostings = JobPosting::with(['company', 'disabilityTypes'])
+                ->where('company_id', $company_id)
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
+            $recentApplicants = Applicant::with(['user', 'jobPosting'])
+                ->whereHas('jobPosting', function ($query) use ($company_id) {
+                    $query->where('company_id', $company_id);
+                })
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
             $dashboard = [
                 'job_postings' => $totalJobPostings,
                 'applicants' => $totalApplicants,
                 'accepted_applicants' => $totalAcceptedApplicants,
                 'rejected_applicants' => $totalRejectedApplicants,
+                'recent_jobpostings' => $recentJobPostings,
+                'recent_applicants' => $recentApplicants
             ];
 
             return response()->json([
