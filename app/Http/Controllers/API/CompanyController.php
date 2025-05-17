@@ -64,7 +64,13 @@ class CompanyController extends Controller
     public function show($company_id)
     {
         try {
-            $company = Company::with(['user', 'jobPostings'])->withCount('jobPostings')->find($company_id);
+            $company = Company::with([
+                'user',
+                'jobPostings' => function ($query) {
+                    $query->with(['company', 'disabilityTypes']);
+                }
+            ])->withCount('jobPostings')->find($company_id);
+
 
             if (!$company) {
                 return response()->json([
