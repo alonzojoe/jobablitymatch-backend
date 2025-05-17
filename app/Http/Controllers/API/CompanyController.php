@@ -61,6 +61,30 @@ class CompanyController extends Controller
     }
 
 
+    public function show($company_id)
+    {
+        try {
+            $company = Company::with(['user', 'jobPostings'])->withCount('jobPostings')->find($company_id);
+
+            if (!$company) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Company not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $company,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 
     public function store(Request $request)

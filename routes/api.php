@@ -39,6 +39,7 @@ Route::group(['prefix' => '/role'], function () {
 
 Route::group(['prefix' => '/company'], function () {
     Route::get('/', [CompanyController::class, 'index']);
+    Route::get('/{company_id}', [CompanyController::class, 'show']);
     Route::post('/create', [CompanyController::class, 'store']);
     Route::patch('/update/{id}', [CompanyController::class, 'update']);
     Route::patch('/destroy/{id}', [CompanyController::class, 'destroy']);
