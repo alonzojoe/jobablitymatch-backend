@@ -97,10 +97,71 @@ class ApplicantController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function getByUserId($user_id, Request $request)
     {
         try {
 
+            $applicants = Applicant::with('jobPosting')
+                ->where('user_id', $user_id)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'total_items' => $applicants->count(),
+                'data' => $applicants,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function notifyCount($user_id)
+    {
+        try {
+            $count = Applicant::where('user_id', $user_id)
+                ->where('active', 1)
+                ->count();
+
+            return response()->json([
+                'status' => 'success',
+                'count' => $count,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function seen($user_id)
+    {
+        try {
+
+            Applicant::where('user_id', $user_id)->updateQuietly(['active' => 0]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'All applicant records marked as unseen.',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
             $request->validate([
                 'status' => 'nullable|string',
             ]);
@@ -109,6 +170,7 @@ class ApplicantController extends Controller
 
             $applicant->update([
                 'status' => $request->status,
+                'active' => 1,
             ]);
 
             return response()->json([
@@ -149,7 +211,7 @@ class ApplicantController extends Controller
         try {
 
             $applications = Applicant::where('user_id', $user_id)
-                ->with('jobPosting')
+                ->with(['jobPosting', 'jobPosting.company'])
                 ->get();
 
             return response()->json([

@@ -11,7 +11,9 @@ use App\Http\Controllers\API\DisabilityTypeController;
 use App\Http\Controllers\API\JobPostingController;
 use App\Http\Controllers\API\ApplicantController;
 use App\Http\Controllers\API\DashboardController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\API\NotificationController;
+
+
 
 Route::get('/test', function () {
     return response()->json(['status' => 'success', 'message' => 'API Endpoint Works!'], 200);
@@ -85,10 +87,17 @@ Route::group(['prefix' => '/applicant'], function () {
     Route::patch('/destroy/{id}', [ApplicantController::class, 'destroy']);
     Route::get('/user/{id}', [ApplicantController::class, 'getApplicationsByUser']);
     Route::get('/job-posting/{id}', [ApplicantController::class, 'getApplicantsByJobPosting']);
+    Route::get('/user/{user_id}', [ApplicantController::class, 'getByUserId']);
 });
 
 
 Route::group(['prefix' => '/dashboard'], function () {
     Route::get('/admin', [DashboardController::class, 'admin']);
     Route::get('/company/{company_id}', [DashboardController::class, 'company']);
+});
+
+
+Route::group(['prefix' => '/notification'], function () {
+    Route::get('/count/{user_id}', [NotificationController::class, 'count']);
+    Route::patch('/seen/{user_id}', [NotificationController::class, 'seen']);
 });
