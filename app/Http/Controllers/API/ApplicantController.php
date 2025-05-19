@@ -211,7 +211,7 @@ class ApplicantController extends Controller
         try {
 
             $applications = Applicant::where('user_id', $user_id)
-                ->with('jobPosting')
+                ->with(['jobPosting', 'jobPosting.company'])
                 ->get();
 
             return response()->json([
