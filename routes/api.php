@@ -99,5 +99,5 @@ Route::group(['prefix' => '/dashboard'], function () {
 
 Route::group(['prefix' => '/notification'], function () {
     Route::get('/count/{user_id}', [NotificationController::class, 'count']);
-    Route::patch('/seen/{user_id}', [NotificationController::class, 'count']);
+    Route::patch('/seen/{user_id}', [NotificationController::class, 'seen']);
 });

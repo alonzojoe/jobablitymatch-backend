@@ -32,7 +32,12 @@ class NotificationController extends Controller
     {
         try {
 
-            Applicant::where('user_id', $user_id)->updateQuietly(['active' => 0]);
+            $applicants = Applicant::where('user_id', $user_id)->get();
+
+            foreach ($applicants as $applicant) {
+                $applicant->active = 0;
+                $applicant->saveQuietly();
+            }
 
             return response()->json([
                 'status' => 'success',
