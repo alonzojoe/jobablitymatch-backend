@@ -85,6 +85,7 @@ Route::group(['prefix' => '/applicant'], function () {
     Route::patch('/destroy/{id}', [ApplicantController::class, 'destroy']);
     Route::get('/user/{id}', [ApplicantController::class, 'getApplicationsByUser']);
     Route::get('/job-posting/{id}', [ApplicantController::class, 'getApplicantsByJobPosting']);
+    Route::get('/user/{user_id}', [ApplicantController::class, 'getByUserId']);
 });
 
 
