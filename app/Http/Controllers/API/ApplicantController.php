@@ -140,6 +140,25 @@ class ApplicantController extends Controller
         }
     }
 
+    public function seen($user_id)
+    {
+        try {
+
+            Applicant::where('user_id', $user_id)->updateQuietly(['active' => 0]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'All applicant records marked as unseen.',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function update(Request $request, $id)
     {
         try {
@@ -158,25 +177,6 @@ class ApplicantController extends Controller
                 'status' => 'success',
                 'message' => 'Applicant status updated successfully',
                 'data' => $applicant,
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function seen($user_id)
-    {
-        try {
-
-            Applicant::where('user_id', $user_id)->updateQuietly(['active' => 0]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'All applicant records marked as unseen.',
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
