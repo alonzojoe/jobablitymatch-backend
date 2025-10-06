@@ -2,8 +2,6 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$_SERVER['REQUEST_URI'] = '/' . $_GET['__VERCEL_ROUTE__'] ?? '/';
-
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
