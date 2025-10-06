@@ -2,8 +2,11 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Fix the request URI so Laravel sees the correct route
-$_SERVER['REQUEST_URI'] = '/' . ltrim($_SERVER['PATH_INFO'] ?? '', '/');
+// Fix server variables for Laravel routing
+$_SERVER['SCRIPT_NAME'] = '/api/index.php';
+$_SERVER['SCRIPT_FILENAME'] = __FILE__;
+$_SERVER['PHP_SELF'] = '/api/index.php';
+$_SERVER['REQUEST_URI'] = $_SERVER['PATH_INFO'] ?? '/';
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
