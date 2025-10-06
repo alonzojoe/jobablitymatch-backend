@@ -1,8 +1,8 @@
 <?php
 
-// Load Laravel App
-
 require __DIR__ . '/../vendor/autoload.php';
+
+$_SERVER['REQUEST_URI'] = '/' . $_GET['__VERCEL_ROUTE__'] ?? '/';
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
@@ -12,4 +12,3 @@ $response = $kernel->handle(
 );
 $response->send();
 $kernel->terminate($request, $response);
-// require __DIR__ . '/../public/index.php';
