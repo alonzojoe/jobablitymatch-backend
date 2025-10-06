@@ -23,9 +23,6 @@
         "VIEW_COMPILED_PATH": "/tmp",
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "cookie",
-        "DB_CONNECTION":"pgsql",
-        "ASSET_URL":"https://your_vercel_domain.vercel.app",
-        "DB_URL":"YOUR_DB_URL"
+        "SESSION_DRIVER": "cookie"
     }
 }
