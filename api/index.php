@@ -6,7 +6,10 @@ require __DIR__ . '/../vendor/autoload.php';
 $_SERVER['SCRIPT_NAME'] = '/api/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 $_SERVER['PHP_SELF'] = '/api/index.php';
-$_SERVER['REQUEST_URI'] = $_SERVER['PATH_INFO'] ?? '/';
+$_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/';
+
+
+
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
