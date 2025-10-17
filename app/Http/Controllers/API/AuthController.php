@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\UserDisabilityType;
@@ -38,10 +39,24 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:6',
                 'disability_type_ids' => 'nullable|array',
-
+                'pwdid_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', //5mb
             ]);
 
+            $pwdidPath = null;
+            if ($request->role_id == 2 && $request->hasFile('pwdid_picture')) {
 
+                if (env('APP_ENV') === 'local') {
+                    $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+                } else {
+                    $uploadedFile = $request->file('pwdid_picture');
+                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                        'folder' => 'pwdid_pictures',
+                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+                    ])->getSecurePath();
+
+                    $pwdidPath = $result;
+                }
+            }
 
             $user = User::create([
                 'firstname' => strtoupper($request->firstname),
@@ -53,6 +68,7 @@ class AuthController extends Controller
                 'phone' => $request->phone,
                 'pwd_id_no' => $request->pwd_id_no,
                 'role_id' => $request->role_id,
+                'pwdid_path' => $pwdidPath,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'company' => 'nullable|string|unique:companies,name',
@@ -219,5 +235,15 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function getCloudinaryPublicId($url)
+    {
+        if (strpos($url, 'cloudinary.com') !== false) {
+            // Extract public_id from Cloudinary URL
+            preg_match('/\/v\d+\/(.+)\.\w+$/', $url, $matches);
+            return $matches[1] ?? null;
+        }
+        return null;
     }
 }
