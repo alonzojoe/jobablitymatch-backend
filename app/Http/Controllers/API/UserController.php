@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserDisabilityType;
 use App\Models\Company;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 
 
@@ -97,8 +98,19 @@ class UserController extends Controller
                 'pwd_id_no' => 'nullable|string',
                 'role_id' => 'nullable|exists:roles,id',
                 'disability_type_ids' => 'nullable|array',
+                'pwdid_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             ]);
 
+            if ($request->role_id == 2 && $request->hasFile('pwdid_picture')) {
+
+                if ($user->pwdid_path && Storage::disk('public')->exists($user->pwdid_path)) {
+                    Storage::disk('public')->delete($user->pwdid_path);
+                }
+
+
+                $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+                $user->pwdid_path = $pwdidPath;
+            }
 
             $user->update([
                 'firstname' => $request->firstname ?? $user->firstname,
