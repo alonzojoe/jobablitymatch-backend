@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserDisabilityType;
 use App\Models\Company;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Exception;
 
 
@@ -103,13 +104,30 @@ class UserController extends Controller
 
             if ($request->role_id == 2 && $request->hasFile('pwdid_picture')) {
 
-                if ($user->pwdid_path && Storage::disk('public')->exists($user->pwdid_path)) {
-                    Storage::disk('public')->delete($user->pwdid_path);
+                if (env('APP_ENV') === 'local') {
+                    if ($user->pwdid_path && Storage::disk('public')->exists($user->pwdid_path)) {
+                        Storage::disk('public')->delete($user->pwdid_path);
+                    }
+
+
+                    $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+                    $user->pwdid_path = $pwdidPath;
+                } else {
+                    if ($user->pwdid_path) {
+                        $publicId = $this->getCloudinaryPublicId($user->pwdid_path);
+                        if ($publicId) {
+                            cloudinary()->destroy($publicId);
+                        }
+                    }
+
+                    $uploadedFile = $request->file('pwdid_picture');
+                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                        'folder' => 'pwdid_pictures',
+                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+                    ])->getSecurePath();
+
+                    $user->pwdid_path = $result;
                 }
-
-
-                $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
-                $user->pwdid_path = $pwdidPath;
             }
 
             $user->update([
@@ -185,9 +203,41 @@ class UserController extends Controller
                 'phone' => 'nullable|string',
                 'pwd_id_no' => 'nullable|string',
                 'disability_type_ids' => 'nullable|array',
+                'pwdid_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             ]);
 
             $user = User::findOrFail($user_id);
+
+            if ($request->hasFile('pwdid_picture')) {
+
+                if (env('APP_ENV') === 'local') {
+
+                    if ($user->pwdid_path && Storage::disk('public')->exists($user->pwdid_path)) {
+                        Storage::disk('public')->delete($user->pwdid_path);
+                    }
+
+
+                    $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+                    $user->pwdid_path = $pwdidPath;
+                } else {
+
+                    if ($user->pwdid_path) {
+                        $publicId = $this->getCloudinaryPublicId($user->pwdid_path);
+                        if ($publicId) {
+                            cloudinary()->destroy($publicId);
+                        }
+                    }
+
+                    $uploadedFile = $request->file('pwdid_picture');
+                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                        'folder' => 'pwdid_pictures',
+                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+                    ])->getSecurePath();
+
+                    $user->pwdid_path = $result;
+                }
+            }
+
             $user->update([
                 'firstname' => strtoupper($request->firstname),
                 'lastname' => strtoupper($request->lastname),
@@ -325,5 +375,14 @@ class UserController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function getCloudinaryPublicId($url)
+    {
+        if (strpos($url, 'cloudinary.com') !== false) {
+            preg_match('/\/v\d+\/(.+)\.\w+$/', $url, $matches);
+            return $matches[1] ?? null;
+        }
+        return null;
     }
 }

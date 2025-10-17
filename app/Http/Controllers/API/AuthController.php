@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\UserDisabilityType;
@@ -43,7 +44,18 @@ class AuthController extends Controller
 
             $pwdidPath = null;
             if ($request->role_id == 2 && $request->hasFile('pwdid_picture')) {
-                $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+
+                if (env('APP_ENV') === 'local') {
+                    $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+                } else {
+                    $uploadedFile = $request->file('pwdid_picture');
+                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                        'folder' => 'pwdid_pictures',
+                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+                    ])->getSecurePath();
+
+                    $pwdidPath = $result;
+                }
             }
 
             $user = User::create([
@@ -223,5 +235,15 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function getCloudinaryPublicId($url)
+    {
+        if (strpos($url, 'cloudinary.com') !== false) {
+            // Extract public_id from Cloudinary URL
+            preg_match('/\/v\d+\/(.+)\.\w+$/', $url, $matches);
+            return $matches[1] ?? null;
+        }
+        return null;
     }
 }
