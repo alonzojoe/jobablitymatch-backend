@@ -38,10 +38,13 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:6',
                 'disability_type_ids' => 'nullable|array',
-
+                'pwdid_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', //5mb
             ]);
 
-
+            $pwdidPath = null;
+            if ($request->role_id == 2 && $request->hasFile('pwdid_picture')) {
+                $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
+            }
 
             $user = User::create([
                 'firstname' => strtoupper($request->firstname),
@@ -53,6 +56,7 @@ class AuthController extends Controller
                 'phone' => $request->phone,
                 'pwd_id_no' => $request->pwd_id_no,
                 'role_id' => $request->role_id,
+                'pwdid_path' => $pwdidPath,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'company' => 'nullable|string|unique:companies,name',
