@@ -123,7 +123,6 @@ class UserController extends Controller
                     $uploadedFile = $request->file('pwdid_picture');
                     $result = cloudinary()->upload($uploadedFile->getRealPath(), [
                         'folder' => 'pwdid_pictures',
-                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
                     ])->getSecurePath();
 
                     $user->pwdid_path = $result;
@@ -231,7 +230,6 @@ class UserController extends Controller
                     $uploadedFile = $request->file('pwdid_picture');
                     $result = cloudinary()->upload($uploadedFile->getRealPath(), [
                         'folder' => 'pwdid_pictures',
-                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
                     ])->getSecurePath();
 
                     $user->pwdid_path = $result;

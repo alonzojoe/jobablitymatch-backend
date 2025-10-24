@@ -51,7 +51,6 @@ class AuthController extends Controller
                     $uploadedFile = $request->file('pwdid_picture');
                     $result = cloudinary()->upload($uploadedFile->getRealPath(), [
                         'folder' => 'pwdid_pictures',
-                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
                     ])->getSecurePath();
 
                     $pwdidPath = $result;
