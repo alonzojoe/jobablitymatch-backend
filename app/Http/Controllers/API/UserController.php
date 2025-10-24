@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\UserDisabilityType;
 use App\Models\Company;
 use Illuminate\Support\Facades\Storage;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 use Exception;
 
 
@@ -113,19 +113,21 @@ class UserController extends Controller
                     $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
                     $user->pwdid_path = $pwdidPath;
                 } else {
-                    if ($user->pwdid_path) {
+                    if ($user->pwdid_path && strpos($user->pwdid_path, 'cloudinary.com') !== false) {
                         $publicId = $this->getCloudinaryPublicId($user->pwdid_path);
                         if ($publicId) {
-                            cloudinary()->destroy($publicId);
+                            $cloudinary = new Cloudinary(config('services.cloudinary'));
+                            $cloudinary->uploadApi()->destroy($publicId);
                         }
                     }
 
-                    $uploadedFile = $request->file('pwdid_picture');
-                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                    $pwdidPicture = $request->file('pwdid_picture');
+                    $cloudinary = new Cloudinary(config('services.cloudinary'));
+                    $uploadedImage = $cloudinary->uploadApi()->upload($pwdidPicture->getRealPath(), [
                         'folder' => 'pwdid_pictures',
-                    ])->getSecurePath();
+                    ]);
 
-                    $user->pwdid_path = $result;
+                    $user->pwdid_path = $uploadedImage['secure_url'];
                 }
             }
 
@@ -215,24 +217,26 @@ class UserController extends Controller
                         Storage::disk('public')->delete($user->pwdid_path);
                     }
 
-
                     $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
                     $user->pwdid_path = $pwdidPath;
                 } else {
 
-                    if ($user->pwdid_path) {
+                    if ($user->pwdid_path && strpos($user->pwdid_path, 'cloudinary.com') !== false) {
                         $publicId = $this->getCloudinaryPublicId($user->pwdid_path);
                         if ($publicId) {
-                            cloudinary()->destroy($publicId);
+                            $cloudinary = new Cloudinary(config('services.cloudinary'));
+                            $cloudinary->uploadApi()->destroy($publicId);
                         }
                     }
 
-                    $uploadedFile = $request->file('pwdid_picture');
-                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
-                        'folder' => 'pwdid_pictures',
-                    ])->getSecurePath();
 
-                    $user->pwdid_path = $result;
+                    $pwdidPicture = $request->file('pwdid_picture');
+                    $cloudinary = new Cloudinary(config('services.cloudinary'));
+                    $uploadedImage = $cloudinary->uploadApi()->upload($pwdidPicture->getRealPath(), [
+                        'folder' => 'pwdid_pictures',
+                    ]);
+
+                    $user->pwdid_path = $uploadedImage['secure_url'];
                 }
             }
 
