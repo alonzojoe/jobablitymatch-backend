@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\UserDisabilityType;
+use Cloudinary\Cloudinary;
 
 class AuthController extends Controller
 {
@@ -48,13 +48,12 @@ class AuthController extends Controller
                 if (env('APP_ENV') === 'local') {
                     $pwdidPath = $request->file('pwdid_picture')->store('pwdid_pictures', 'public');
                 } else {
-                    $uploadedFile = $request->file('pwdid_picture');
-                    $result = cloudinary()->upload($uploadedFile->getRealPath(), [
+                    $pwdidPicture = $request->file('pwdid_picture');
+                    $cloudinary = new Cloudinary(config('services.cloudinary'));
+                    $uploadedImage = $cloudinary->uploadApi()->upload($pwdidPicture->getRealPath(), [
                         'folder' => 'pwdid_pictures',
-                        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
-                    ])->getSecurePath();
-
-                    $pwdidPath = $result;
+                    ]);
+                    $pwdidPath = $uploadedImage['secure_url'];
                 }
             }
 
