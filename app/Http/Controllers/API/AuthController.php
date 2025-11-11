@@ -236,6 +236,43 @@ class AuthController extends Controller
         }
     }
 
+    public function resetPassword(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'email' => 'required|string|email|exists:users,email',
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user->birthdate) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User birthdate not found. Cannot reset password.'
+                ], 400);
+            }
+
+            $birthdate = \Carbon\Carbon::parse($user->birthdate);
+            $newPassword = $birthdate->format('mdY');
+
+            $user->password = Hash::make($newPassword);
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Password reset successfully',
+                'new_password' => $newPassword
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     private function getCloudinaryPublicId($url)
     {
         if (strpos($url, 'cloudinary.com') !== false) {
