@@ -28,6 +28,7 @@ Route::group(['prefix' => '/auth'], function () {
     Route::post('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
 Route::group(['prefix' => '/role'], function () {
