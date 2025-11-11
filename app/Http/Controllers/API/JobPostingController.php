@@ -293,6 +293,8 @@ class JobPostingController extends Controller
                 'vacant_positions' => 'nullable|integer',
                 'company_id' => 'nullable|integer',
                 'disability_type_ids' => 'nullable|array',
+                'hiring_from' => 'nullable|date',
+                'hiring_to' => 'nullable|date',
             ]);
 
 
@@ -300,7 +302,9 @@ class JobPostingController extends Controller
                 'title' => $request->title,
                 'description' => $request->description,
                 'company_id' => $request->company_id,
-                'vacant_positions' => $request->vacant_positions
+                'vacant_positions' => $request->vacant_positions,
+                'hiring_from' => $request->hiring_from,
+                'hiring_to' => $request->hiring_to,
             ]);
 
 
@@ -342,6 +346,8 @@ class JobPostingController extends Controller
                 'description' => 'nullable|string',
                 'vacant_positions' => 'nullable|integer',
                 'disability_type_ids' => 'nullable|array',
+                'hiring_from' => 'nullable|date',
+                'hiring_to' => 'nullable|date',
             ]);
 
 
@@ -349,6 +355,8 @@ class JobPostingController extends Controller
                 'title' => $request->title ?? $jobPosting->title,
                 'description' => $request->description ?? $jobPosting->description,
                 'vacant_positions' =>  $request->vacant_positions ?? $jobPosting->vacant_positions,
+                'hiring_from' => $request->hiring_from ?? $jobPosting->hiring_from,
+                'hiring_to' => $request->hiring_to ?? $jobPosting->hiring_to,
             ]);
 
 
