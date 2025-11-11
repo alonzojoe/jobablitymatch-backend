@@ -57,6 +57,7 @@ Route::group(['prefix' => '/user'], function () {
     Route::patch('/pwd/{user_id}', [UserController::class, 'updatePWDUser']);
     Route::patch('/employer/{user_id}', [UserController::class, 'updateEmployer']);
     Route::patch('/admin/{user_id}', [UserController::class, 'updateUser']);
+    Route::patch('/status/{userID}', [UserController::class, 'activeInactive']);
 });
 
 Route::group(['prefix' => '/disability'], function () {

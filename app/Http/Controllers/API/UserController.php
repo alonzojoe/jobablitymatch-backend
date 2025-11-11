@@ -379,6 +379,34 @@ class UserController extends Controller
         }
     }
 
+    public function activeInactive($userID)
+    {
+
+        try {
+            $user = User::findOrFail($userID);
+
+            $user->update(['status' => $user->status == 1 ? 0 : 1]);
+
+            $statusText = $user->status == 1 ? 'activated' : 'deactivated';
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "User status updated successfully!",
+                'data' => [
+                    'user_id' => $user->id,
+                    'status' => $user->status,
+                    'message' => $statusText
+                ]
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     private function getCloudinaryPublicId($url)
     {
         if (strpos($url, 'cloudinary.com') !== false) {
