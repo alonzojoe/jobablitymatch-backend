@@ -18,7 +18,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
+            // $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
+            $query = User::with(['role', 'company', 'disabilityTypes']);
 
             if ($request->has('role_id') && $request->role_id != 0) {
                 $query->whereHas('role', function ($q) use ($request) {
@@ -379,11 +380,11 @@ class UserController extends Controller
         }
     }
 
-    public function activeInactive($userID)
+    public function activeInactive($user_id)
     {
 
         try {
-            $user = User::findOrFail($userID);
+            $user = User::findOrFail($user_id);
 
             $user->update(['status' => $user->status == 1 ? 0 : 1]);
 
