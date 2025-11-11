@@ -18,7 +18,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
+            // $query = User::with(['role', 'company', 'disabilityTypes'])->where('status', 1);
+            $query = User::with(['role', 'company', 'disabilityTypes']);
 
             if ($request->has('role_id') && $request->role_id != 0) {
                 $query->whereHas('role', function ($q) use ($request) {
@@ -374,6 +375,34 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while updating employer data',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activeInactive($user_id)
+    {
+
+        try {
+            $user = User::findOrFail($user_id);
+
+            $user->update(['status' => $user->status == 1 ? 0 : 1]);
+
+            $statusText = $user->status == 1 ? 'activated' : 'deactivated';
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "User status updated successfully!",
+                'data' => [
+                    'user_id' => $user->id,
+                    'status' => $user->status,
+                    'message' => $statusText
+                ]
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
                 'error' => $e->getMessage(),
             ], 500);
         }
