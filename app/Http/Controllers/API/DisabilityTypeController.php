@@ -35,7 +35,8 @@ class DisabilityTypeController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = DisabilityType::where('status', 1);
+            // $query = DisabilityType::where('status', 1);
+            $query = DisabilityType::query();
 
 
             if ($request->has('name')) {
@@ -144,6 +145,33 @@ class DisabilityTypeController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Disability type deleted successfully',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activeInactive($id)
+    {
+        try {
+            $disabilityType = DisabilityType::findOrFail($id);
+
+            $disabilityType->update(['status' => $disabilityType->status == 1 ? 0 : 1]);
+
+            $statusText = $disabilityType->status == 1 ? 'activated' : 'deactivated';
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Disability Type status updated successfully!",
+                'data' => [
+                    'user_id' => $disabilityType->id,
+                    'status' => $disabilityType->status,
+                    'message' => $statusText
+                ]
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([

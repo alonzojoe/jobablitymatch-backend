@@ -46,6 +46,7 @@ Route::group(['prefix' => '/company'], function () {
     Route::post('/create', [CompanyController::class, 'store']);
     Route::patch('/update/{id}', [CompanyController::class, 'update']);
     Route::patch('/destroy/{id}', [CompanyController::class, 'destroy']);
+    Route::patch('/status/{id}', [CompanyController::class, 'activeInactive']);
 });
 
 
@@ -67,6 +68,7 @@ Route::group(['prefix' => '/disability'], function () {
     Route::post('/create', [DisabilityTypeController::class, 'store']);
     Route::put('/update/{id}', [DisabilityTypeController::class, 'update']);
     Route::patch('/destroy/{id}', [DisabilityTypeController::class, 'destroy']);
+    Route::patch('/status/{id}', [DisabilityTypeController::class, 'activeInactive']);
 });
 
 Route::group(['prefix' => '/posting'], function () {

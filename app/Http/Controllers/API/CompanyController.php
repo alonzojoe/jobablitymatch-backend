@@ -13,8 +13,8 @@ class CompanyController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Company::with(['user', 'jobPostings'])->withCount('jobPostings')->where('status', 1);
-
+            // $query = Company::with(['user', 'jobPostings'])->withCount('jobPostings')->where('status', 1);
+            $query = Company::with(['user', 'jobPostings'])->withCount('jobPostings');
             if ($request->has('name')) {
                 $query->where('name', 'LIKE', '%' . $request->name . '%');
             }
@@ -163,6 +163,33 @@ class CompanyController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Company deleted successfully',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activeInactive($id)
+    {
+        try {
+            $company = Company::findOrFail($id);
+
+            $company->update(['status' => $company->status == 1 ? 0 : 1]);
+
+            $statusText = $company->status == 1 ? 'activated' : 'deactivated';
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Company status updated successfully!",
+                'data' => [
+                    'user_id' => $company->id,
+                    'status' => $company->status,
+                    'message' => $statusText
+                ]
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
