@@ -18,8 +18,8 @@ class JobPostingController extends Controller
                 ->where('status', 1);
 
 
-            if ($request->has('query') && !empty($request->query)) {
-                $searchTerm = $request->query;
+            if ($request->has('query') && !empty($request->input('query'))) {
+                $searchTerm = $request->input('query');
 
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('title', 'LIKE', '%' . $searchTerm . '%')
