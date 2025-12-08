@@ -28,7 +28,7 @@ class UserController extends Controller
             }
 
 
-            if ($request->has('query') && !empty($request->query)) {
+            if ($request->has('query') && !empty($request->input('query'))) {
                 $searchTerm = $request->input('query');
 
                 $query->where(function ($q) use ($searchTerm) {

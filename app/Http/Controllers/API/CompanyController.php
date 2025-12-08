@@ -19,8 +19,8 @@ class CompanyController extends Controller
                 $query->where('name', 'LIKE', '%' . $request->name . '%');
             }
 
-            if ($request->has('query') && !empty($request->query)) {
-                $searchTerm = $request->query;
+            if ($request->has('query') && !empty($request->input('query'))) {
+                $searchTerm = $request->input('query');
 
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('name', 'LIKE', '%' . $searchTerm . '%')
@@ -33,7 +33,6 @@ class CompanyController extends Controller
                         });
                 });
             }
-
             $companies = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
 
             return response()->json([
