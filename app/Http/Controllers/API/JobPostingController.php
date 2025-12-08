@@ -18,13 +18,13 @@ class JobPostingController extends Controller
                 ->where('status', 1);
 
 
-            if ($request->filled('title')) {
-                $query->where('title', 'LIKE', '%' . $request->title . '%');
-            }
+            if ($request->has('query') && !empty($request->input('query'))) {
+                $searchTerm = $request->input('query');
 
-
-            if ($request->filled('description')) {
-                $query->where('description', 'LIKE', '%' . $request->description . '%');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('title', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('description', 'LIKE', '%' . $searchTerm . '%');
+                });
             }
 
 

@@ -27,24 +27,17 @@ class UserController extends Controller
                 });
             }
 
-            if ($request->has('lastname')) {
-                $query->where('lastname', 'LIKE', '%' . $request->lastname . '%');
-            }
 
-            if ($request->has('firstname')) {
-                $query->where('firstname', 'LIKE', '%' . $request->firstname . '%');
-            }
+            if ($request->has('query') && !empty($request->input('query'))) {
+                $searchTerm = $request->input('query');
 
-            if ($request->has('middlename')) {
-                $query->where('middlename', 'LIKE', '%' . $request->middlename . '%');
-            }
-
-            if ($request->has('email')) {
-                $query->where('email', 'LIKE', '%' . $request->email . '%');
-            }
-
-            if ($request->has('pwd_id_no')) {
-                $query->where('pwd_id_no', 'LIKE', '%' . $request->pwd_id_no . '%');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('lastname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('firstname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('middlename', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('pwd_id_no', 'LIKE', '%' . $searchTerm . '%');
+                });
             }
 
             $users = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
