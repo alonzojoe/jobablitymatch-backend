@@ -29,7 +29,7 @@ class UserController extends Controller
 
 
             if ($request->has('query') && !empty($request->query)) {
-                $searchTerm = $request->query;
+                $searchTerm = $request->input('query');
 
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('lastname', 'LIKE', '%' . $searchTerm . '%')
