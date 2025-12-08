@@ -21,17 +21,15 @@ class ApplicantController extends Controller
                 $query->where('status', $request->status);
             }
 
-            $query->whereHas('user', function ($userQuery) use ($request) {
-                if ($request->has('lastname')) {
-                    $userQuery->where('lastname', 'LIKE', '%' . $request->lastname . '%');
-                }
-                if ($request->has('firstname')) {
-                    $userQuery->where('firstname', 'LIKE', '%' . $request->firstname . '%');
-                }
-                if ($request->has('middlename')) {
-                    $userQuery->where('middlename', 'LIKE', '%' . $request->middlename . '%');
-                }
-            });
+            if ($request->has('query') && !empty($request->query)) {
+                $searchTerm = $request->query;
+
+                $query->whereHas('user', function ($userQuery) use ($searchTerm) {
+                    $userQuery->where('lastname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('firstname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('middlename', 'LIKE', '%' . $searchTerm . '%');
+                });
+            }
 
             $applicants = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
 
@@ -230,11 +228,6 @@ class ApplicantController extends Controller
     public function getApplicantsByJobPosting(Request $request, $job_posting_id)
     {
         try {
-            $lastname = $request->input('lastname');
-            $firstname = $request->input('firstname');
-            $middlename = $request->input('middlename');
-            $email = $request->input('email');
-
 
             $query = Applicant::where('job_posting_id', $job_posting_id)
                 ->with(['user', 'user.disabilityTypes']);
@@ -243,19 +236,16 @@ class ApplicantController extends Controller
                 $query->where('status', $request->status);
             }
 
-            if ($lastname) {
-                $query->whereHas('user', fn($q) => $q->where('lastname', 'like', "%$lastname%"));
-            }
-            if ($firstname) {
-                $query->whereHas('user', fn($q) => $q->where('firstname', 'like', "%$firstname%"));
-            }
-            if ($middlename) {
-                $query->whereHas('user', fn($q) => $q->where('middlename', 'like', "%$middlename%"));
-            }
-            if ($email) {
-                $query->whereHas('user', fn($q) => $q->where('email', 'like', "%$email%"));
-            }
+            if ($request->has('query') && !empty($request->query)) {
+                $searchTerm = $request->query;
 
+                $query->whereHas('user', function ($q) use ($searchTerm) {
+                    $q->where('lastname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('firstname', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('middlename', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('email', 'LIKE', '%' . $searchTerm . '%');
+                });
+            }
 
             $applicants = $query->paginate(10);
 
