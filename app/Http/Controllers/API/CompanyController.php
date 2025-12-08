@@ -19,26 +19,18 @@ class CompanyController extends Controller
                 $query->where('name', 'LIKE', '%' . $request->name . '%');
             }
 
-            if ($request->has('address')) {
-                $query->where('address', 'LIKE', '%' . $request->address . '%');
-            }
+            if ($request->has('query') && !empty($request->query)) {
+                $searchTerm = $request->query;
 
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('name', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('address', 'LIKE', '%' . $searchTerm . '%')
 
-            if ($request->has('lastname')) {
-                $query->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('lastname', 'LIKE', '%' . $request->lastname . '%');
-                });
-            }
-
-            if ($request->has('firstname')) {
-                $query->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('firstname', 'LIKE', '%' . $request->firstname . '%');
-                });
-            }
-
-            if ($request->has('middlename')) {
-                $query->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('middlename', 'LIKE', '%' . $request->middlename . '%');
+                        ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                            $userQuery->where('lastname', 'LIKE', '%' . $searchTerm . '%')
+                                ->orWhere('firstname', 'LIKE', '%' . $searchTerm . '%')
+                                ->orWhere('middlename', 'LIKE', '%' . $searchTerm . '%');
+                        });
                 });
             }
 
