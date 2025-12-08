@@ -236,8 +236,8 @@ class ApplicantController extends Controller
                 $query->where('status', $request->status);
             }
 
-            if ($request->has('query') && !empty($request->query)) {
-                $searchTerm = $request->query;
+            if ($request->has('query') && !empty($request->input('query'))) {
+                $searchTerm = $request->input('query');
 
                 $query->whereHas('user', function ($q) use ($searchTerm) {
                     $q->where('lastname', 'LIKE', '%' . $searchTerm . '%')
